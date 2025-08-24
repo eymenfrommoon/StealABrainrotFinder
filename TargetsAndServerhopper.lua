@@ -88,10 +88,17 @@ local function ScanPets()
                 bb.Adornee = pet:FindFirstChildWhichIsA("BasePart")
                 local tl = Instance.new("TextLabel", bb)
                 tl.Size = UDim2.new(1,0,1,0)
-                tl.Text = "🎯 TARGET"
+                tl.Text = "🎯 Target Pet"
                 tl.TextColor3 = Color3.fromRGB(255,0,0)
                 tl.TextScaled = true
                 tl.BackgroundTransparency = 1
+                tl.Font = Enum.Font.GothamBold  -- Font değişti
+
+                -- Stroke ekleme
+                local stroke = Instance.new("UIStroke", tl)
+                stroke.Thickness = 2
+                stroke.Color = Color3.new(0,0,0)
+                stroke.Transparency = 0
             end
         end
     end
