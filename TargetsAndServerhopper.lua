@@ -114,9 +114,11 @@ local function ServerHop()
             "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
         ))
     end)
+
     if success and servers.data then
         for _,srv in pairs(servers.data) do
-            if srv.playing < srv.maxPlayers then
+            -- 🎯 Filtre: boş servera girme, max değilse dene
+            if srv.playing > 0 and srv.playing < srv.maxPlayers then
                 local ok, err = pcall(function()
                     TeleportService:TeleportToPlaceInstance(game.PlaceId, srv.id, LocalPlayer)
                 end)
@@ -128,9 +130,12 @@ local function ServerHop()
                 break
             end
         end
+    else
+        warn("Server listesi alınamadı, tekrar denenecek...")
+        task.wait(5)
+        ServerHop()
     end
 end
-
 --== ANA LOOP ==--
 task.spawn(function()
     while task.wait(5) do
