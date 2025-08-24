@@ -67,12 +67,14 @@ local function SendWebhook(pets)
         }}
     }
     local body = HttpService:JSONEncode(data)
-    syn.request({
-        Url = WebhookURL,
-        Method = "POST",
-        Headers = {["Content-Type"] = "application/json"},
-        Body = body
-    })
+
+    if syn then
+        syn.request({Url = WebhookURL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = body})
+    elseif http_request then
+        http_request({Url = WebhookURL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = body})
+    else
+        warn("HTTP request function not found for webhook!")
+    end
 end
 
 --== TARGET BULMA ==--
@@ -131,14 +133,14 @@ end
 
 --== ANA LOOP ==--
 task.spawn(function()
-    while task.wait(10) do
+    while task.wait(5) do
         local targets = ScanPets()
         if #targets > 0 then
             -- target bulundu
             Notify("MoonFinder 🎯", "Target Pet(s) bulundu!", 8)
             SendWebhook(targets)
             repeat
-                task.wait(10)
+                task.wait(5)
                 targets = ScanPets()
             until #targets == 0
             -- target yok oldu, devam et
