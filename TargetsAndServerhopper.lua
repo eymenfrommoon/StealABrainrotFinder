@@ -116,19 +116,29 @@ local function ServerHop()
     end)
 
     if success and servers.data then
+        local validServers = {}
         for _,srv in pairs(servers.data) do
-            -- 🎯 Filtre: boş servera girme, max değilse dene
             if srv.playing > 0 and srv.playing < srv.maxPlayers then
-                local ok, err = pcall(function()
-                    TeleportService:TeleportToPlaceInstance(game.PlaceId, srv.id, LocalPlayer)
-                end)
-                if not ok then
-                    warn("Teleport failed: retrying...")
-                    task.wait(2)
-                    ServerHop()
-                end
-                break
+                table.insert(validServers, srv)
             end
+        end
+
+        if #validServers > 0 then
+            local midIndex = math.floor(#validServers / 2)
+            local chosen = validServers[midIndex > 0 and midIndex or 1]
+
+            local ok, err = pcall(function()
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, chosen.id, LocalPlayer)
+            end)
+            if not ok then
+                warn("Teleport failed: retrying...")
+                task.wait(2)
+                ServerHop()
+            end
+        else
+            warn("Uygun server bulunamadı, tekrar denenecek...")
+            task.wait(5)
+            ServerHop()
         end
     else
         warn("Server listesi alınamadı, tekrar denenecek...")
